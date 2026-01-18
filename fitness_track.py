@@ -22,10 +22,11 @@ class FitnessTracker:
             bench_press_norm = self.calculate_normalise_score(row['bench_press'], 47, 98)
             squat_norm = self.calculate_normalise_score(row['squat'], 60, 130)
             overhead_press_norm = self.calculate_normalise_score(row['overhead_press'], 30, 64)
+            deadlift_norm = self.calculate_normalise_score(row['deadlift'], 90,150)
 
             overall_score = self.calculate_average_scores(
                  pull_up_norm, fivekm_time_norm,
-                 bench_press_norm, squat_norm, overhead_press_norm
+                 bench_press_norm, squat_norm, overhead_press_norm, deadlift_norm
             )
 
             results.append({
@@ -36,6 +37,7 @@ class FitnessTracker:
                 'bench_press_norm': bench_press_norm,
                 'squat_norm': squat_norm,
                 'overhead_press_norm': overhead_press_norm,
+                'deadlift_norm':deadlift_norm,
             })
 
         results_df = pd.DataFrame.from_dict(results)
@@ -43,14 +45,19 @@ class FitnessTracker:
 
     def plot_results(self, results_df):
         data = results_df
-        data['date'] = pd.to_datetime(data['date'])
+        data['date'] = pd.to_datetime(
+                data['date'],
+                format='%d/%m/%Y',   # day/month/year
+                dayfirst=True        # extra safety; optional with the explicit format
+            )
         data.set_index('date', inplace=True)
         sns.lineplot(
             data=data[['pull_up_norm',
                        'fivekm_time_norm',
                        'bench_press_norm',
                        'squat_norm',
-                       'overhead_press_norm'
+                       'overhead_press_norm',
+                       'deadlift_norm'
                        ]],
                        )
 
@@ -70,6 +77,7 @@ class FitnessTracker:
         # process results
         results_df = self.process_results()
         # plot result
+        print(results_df)
         self.plot_results(results_df)
 
 inp_file = 'input_pbs.csv'
