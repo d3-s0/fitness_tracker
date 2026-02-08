@@ -18,11 +18,11 @@ class FitnessTracker:
 
         for _, row in self.data.iterrows():
             pull_up_norm = self.calculate_normalise_score(row['pull_up'], 1, 14)
-            fivekm_time_norm = self.calculate_normalise_score(row['fivekm_time'], 32.0, 22.5)
+            fivekm_time_norm = self.calculate_normalise_score(row['fivekm_time'], 32, 22.5)
             bench_press_norm = self.calculate_normalise_score(row['bench_press'], 47, 98)
             squat_norm = self.calculate_normalise_score(row['squat'], 60, 130)
             overhead_press_norm = self.calculate_normalise_score(row['overhead_press'], 30, 64)
-            deadlift_norm = self.calculate_normalise_score(row['deadlift'], 90,150)
+            deadlift_norm = self.calculate_normalise_score(row['deadlift'], 90, 150)
 
             overall_score = self.calculate_average_scores(
                  pull_up_norm, fivekm_time_norm,
@@ -47,11 +47,10 @@ class FitnessTracker:
         data = results_df
         data['date'] = pd.to_datetime(
                 data['date'],
-                format='%d/%m/%Y',   # day/month/year
-                dayfirst=True        # extra safety; optional with the explicit format
+                format='%d/%m/%Y',
             )
         data.set_index('date', inplace=True)
-        sns.lineplot(
+        ax = sns.lineplot(
             data=data[['pull_up_norm',
                        'fivekm_time_norm',
                        'bench_press_norm',
@@ -62,12 +61,28 @@ class FitnessTracker:
                        )
 
         sns.lineplot(data=data['overall_score'], color='black', linewidth=3, label='Overall Score')
+        for line in ax.lines:
+            x_data = line.get_xdata()
+            y_data = line.get_ydata()
+            if len(x_data) > 0:
+                x = x_data[-1]
+                y = y_data[-1]
+                is_overall = line.get_label() == 'Overall Score'
+                ax.annotate(
+                    f'{y:.0f}',
+                    xy=(x, y),
+                    xytext=(7, 0),
+                    textcoords="offset points",
+                    color=line.get_color(),
+                    va="center",
+                    fontweight='bold' if is_overall else 'normal',
+                    fontsize=10 if is_overall else 9
+                )
 
-        plt.title('Normalised Fitness Scores Over Time')
+        plt.title('Fitness level over time')
         plt.xlabel('Date')
-        plt.ylabel('Normalised Score')
-
-        plt.grid()
+        plt.ylabel('Level')
+        plt.ylim(0, 100)
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.savefig('plots/fitness_score.png')
@@ -76,8 +91,6 @@ class FitnessTracker:
     def run(self):
         # process results
         results_df = self.process_results()
-        # plot result
-        print(results_df)
         self.plot_results(results_df)
 
 inp_file = 'input_pbs.csv'
