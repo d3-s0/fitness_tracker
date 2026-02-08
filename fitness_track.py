@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 class FitnessTracker:
     def __init__(self, inp_file):
@@ -31,13 +32,13 @@ class FitnessTracker:
 
             results.append({
                 'date': row['date'],
-                'overall_score': overall_score,
-                'pull_up_norm': pull_up_norm,
-                'fivekm_time_norm': fivekm_time_norm,
-                'bench_press_norm': bench_press_norm,
-                'squat_norm': squat_norm,
-                'overhead_press_norm': overhead_press_norm,
-                'deadlift_norm':deadlift_norm,
+                'Overall Score': overall_score,
+                'Pull up': pull_up_norm,
+                '5K': fivekm_time_norm,
+                'Bench press': bench_press_norm,
+                'Squat': squat_norm,
+                'Overhead press': overhead_press_norm,
+                'Deadlift':deadlift_norm,
             })
 
         results_df = pd.DataFrame.from_dict(results)
@@ -50,17 +51,19 @@ class FitnessTracker:
                 format='%d/%m/%Y',
             )
         data.set_index('date', inplace=True)
-        ax = sns.lineplot(
-            data=data[['pull_up_norm',
-                       'fivekm_time_norm',
-                       'bench_press_norm',
-                       'squat_norm',
-                       'overhead_press_norm',
-                       'deadlift_norm'
+        fig, ax = plt.subplots()
+        sns.lineplot(
+            data=data[[
+                       '5K',
+                       'Bench press',
+                       'Deadlift',
+                       'Overhead press',
+                       'Pull up',
+                       'Squat'
                        ]],
                        )
 
-        sns.lineplot(data=data['overall_score'], color='black', linewidth=3, label='Overall Score')
+        sns.lineplot(data=data['Overall Score'], color='black', linewidth=3, label='Overall Score')
         for line in ax.lines:
             x_data = line.get_xdata()
             y_data = line.get_ydata()
@@ -78,10 +81,12 @@ class FitnessTracker:
                     fontweight='bold' if is_overall else 'normal',
                     fontsize=10 if is_overall else 9
                 )
-
+        # Month + year labels (e.g. Jan 2025)
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
         plt.title('Fitness level over time')
         plt.xlabel('Date')
-        plt.ylabel('Level')
+        plt.ylabel('Fitness Level')
         plt.ylim(0, 100)
         plt.xticks(rotation=45)
         plt.tight_layout()
