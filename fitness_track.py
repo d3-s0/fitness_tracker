@@ -2,6 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from pathlib import Path
+
+
 
 class FitnessTracker:
     def __init__(self, inp_file):
@@ -42,6 +45,7 @@ class FitnessTracker:
             })
 
         results_df = pd.DataFrame.from_dict(results)
+        print(results_df)
         return results_df
 
     def plot_results(self, results_df):
@@ -90,7 +94,8 @@ class FitnessTracker:
         plt.ylim(0, 100)
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig('plots/fitness_score.png')
+        out_file = BASE_DIR /"fitness_score.png"
+        plt.savefig(out_file)
         plt.close()
 
     def run(self):
@@ -98,6 +103,7 @@ class FitnessTracker:
         results_df = self.process_results()
         self.plot_results(results_df)
 
-inp_file = 'input_pbs.csv'
+BASE_DIR = Path(__file__).resolve().parent
+inp_file = BASE_DIR / "input_pbs.csv"
 fitness_tracker = FitnessTracker(inp_file)
 fitness_tracker.run()
