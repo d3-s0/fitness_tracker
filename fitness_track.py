@@ -99,7 +99,7 @@ class FitnessTracker:
             )
         
         ax.annotate(
-            f' {last_row["Overall Score"]:.0f}', # Show the normalized result
+            f' {last_row["Overall Score"]:.0f}', # Show the normalised result
             xy=(last_date, last_row["Overall Score"]),
             textcoords="offset points", xytext=(5, 0), va='center', 
             fontsize=10, fontweight='bold', color='black'
@@ -117,9 +117,9 @@ class FitnessTracker:
         plt.xticks(rotation=45)
 
         # Convert your collected data into a matrix/list format for matplotlib
-        columns = ["Metric",  "Raw Score", "Normalized Score"]
+        columns = ["Metric",  "Raw Score", "Normalised Score"]
 
-        # Move the plot area up to leave 35% space at the bottom for the table
+        # Move the plot area up to leave 45% space at the bottom for the table
         plt.subplots_adjust(bottom=0.45)
 
         # Render the table under the x-axis
@@ -131,14 +131,10 @@ class FitnessTracker:
             bbox=[0.0, -0.70, 1.0, 0.45]
         )
 
-        summary_table.set_fontsize(
-            11
-        )  # 3. Explicitly set a clean font size (stops auto-shrinking)
+        summary_table.set_fontsize(11)  
 
-        # 4. Push the table down relative to the x-axis so it doesn't touch the plot line
-        for cell in summary_table.get_celld().values():
-            cell.set_edgecolor("#CCCCCC")  # Optional: Soften the gridlines
-
+        for cell in [summary_table[0, c] for c in range(3)]:
+            cell.set_text_props(fontweight="bold", color="#1A365D")
 
         # plt.tight_layout()
         out_file = BASE_DIR /"fitness_score.png"
