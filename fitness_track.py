@@ -42,6 +42,13 @@ class FitnessTracker:
                 'Squat': squat_norm,
                 'Overhead press': overhead_press_norm,
                 'Deadlift':deadlift_norm,
+                'Pull up_raw': row['pull_up'],
+                '5K_raw': row['fivekm_time'],
+                'Bench press_raw': row['bench_press'],
+                'Squat_raw': row['squat'],
+                'Overhead press_raw': row['overhead_press'],
+                'Deadlift_raw': row['deadlift']
+
             })
 
         results_df = pd.DataFrame.from_dict(results)
@@ -55,7 +62,9 @@ class FitnessTracker:
                 format='%d/%m/%Y',
             )
         data.set_index('date', inplace=True)
-        fig, ax = plt.subplots()
+
+        metrics = ['5K', 'Bench press', 'Deadlift', 'Overhead press', 'Pull up', 'Squat']
+        fig, ax = plt.subplots(figsize=(8, 10))
         sns.lineplot(
             data=data[[
                        '5K',
@@ -66,25 +75,38 @@ class FitnessTracker:
                        'Squat'
                        ]],
                        )
+        
 
         sns.lineplot(data=data['Overall Score'], color='black', linewidth=3, label='Overall Score')
-        for line in ax.lines:
-            x_data = line.get_xdata()
-            y_data = line.get_ydata()
-            if len(x_data) > 0:
-                x = x_data[-1]
-                y = y_data[-1]
-                is_overall = line.get_label() == 'Overall Score'
-                ax.annotate(
-                    f'{y:.0f}',
-                    xy=(x, y),
-                    xytext=(7, 0),
-                    textcoords="offset points",
-                    color=line.get_color(),
-                    va="center",
-                    fontweight='bold' if is_overall else 'normal',
-                    fontsize=10 if is_overall else 9
-                )
+        last_row = data.iloc[-1]
+        last_date = data.index[-1]
+        table_rows = []
+        for metric in metrics:
+            y_norm = data[metric].iloc[-1]      # Position on the graph
+            label_raw = data[f'{metric}_raw'].iloc[-1] # The text to show
+             # Collect values for the summary table
+            table_rows.append([metric, f"{label_raw}", f"{y_norm:.2f}"])
+
+            
+            ax.annotate(
+                f' {y_norm}', 
+                xy=(last_date, y_norm),
+                textcoords="offset points", 
+                xytext=(5, 0), 
+                va='center',
+                fontweight='bold',
+                color='grey'
+            )
+        
+        ax.annotate(
+            f' {last_row["Overall Score"]:.0f}', # Show the normalized result
+            xy=(last_date, last_row["Overall Score"]),
+            textcoords="offset points", xytext=(5, 0), va='center', 
+            fontsize=10, fontweight='bold', color='black'
+        )
+
+
+
         # Month + year labels (e.g. Jan 2025)
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
@@ -93,7 +115,32 @@ class FitnessTracker:
         plt.ylabel('Fitness Level')
         plt.ylim(0, 100)
         plt.xticks(rotation=45)
-        plt.tight_layout()
+
+        # Convert your collected data into a matrix/list format for matplotlib
+        columns = ["Metric",  "Raw Score", "Normalized Score"]
+
+        # Move the plot area up to leave 35% space at the bottom for the table
+        plt.subplots_adjust(bottom=0.45)
+
+        # Render the table under the x-axis
+        summary_table = plt.table(
+            cellText=table_rows,
+            colLabels=columns,
+            loc="bottom",
+            cellLoc="center",
+            bbox=[0.0, -0.70, 1.0, 0.45]
+        )
+
+        summary_table.set_fontsize(
+            11
+        )  # 3. Explicitly set a clean font size (stops auto-shrinking)
+
+        # 4. Push the table down relative to the x-axis so it doesn't touch the plot line
+        for cell in summary_table.get_celld().values():
+            cell.set_edgecolor("#CCCCCC")  # Optional: Soften the gridlines
+
+
+        # plt.tight_layout()
         out_file = BASE_DIR /"fitness_score.png"
         plt.savefig(out_file)
         plt.close()
