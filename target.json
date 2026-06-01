@@ -1,0 +1,8 @@
+{
+    "pull_up": {"min": 1, "max": 14},
+    "fivekm_time": {"min": 32, "max": 22.5}, 
+    "bench_press": {"min": 47, "max": 98},
+    "squat": {"min": 60, "max": 130},
+    "overhead_press": {"min": 30, "max": 64},
+    "deadlift": {"min": 90, "max": 150}
+}

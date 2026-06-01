@@ -3,12 +3,21 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from pathlib import Path
-
+import json
 
 
 class FitnessTracker:
-    def __init__(self, inp_file):
+    def __init__(self):
+        self.BASE_DIR = Path(__file__).resolve().parent
+        inp_file = self.BASE_DIR / "input_pbs.csv"
+        target_file = self.BASE_DIR / "target.json"
         self.data = pd.read_csv(inp_file)
+
+        self.score_bounds = self.load_targets(target_file)
+
+    def load_targets(self, path):
+        with open(path) as file:
+            return json.load(file)
 
     def calculate_normalise_score(self, score, min_score, max_score):
         normalised_score = int(max(((score - min_score) / (max_score - min_score)), 0) * 100)
@@ -21,12 +30,42 @@ class FitnessTracker:
         results = []
 
         for _, row in self.data.iterrows():
-            pull_up_norm = self.calculate_normalise_score(row['pull_up'], 1, 14)
-            fivekm_time_norm = self.calculate_normalise_score(row['fivekm_time'], 32, 22.5)
-            bench_press_norm = self.calculate_normalise_score(row['bench_press'], 47, 98)
-            squat_norm = self.calculate_normalise_score(row['squat'], 60, 130)
-            overhead_press_norm = self.calculate_normalise_score(row['overhead_press'], 30, 64)
-            deadlift_norm = self.calculate_normalise_score(row['deadlift'], 90, 150)
+            pull_up_norm = self.calculate_normalise_score(
+                row['pull_up'], 
+                self.score_bounds['pull_up']['min'], 
+                self.score_bounds['pull_up']['max']
+            )
+
+            fivekm_time_norm = self.calculate_normalise_score(
+                row['fivekm_time'], 
+                self.score_bounds['fivekm_time']['min'], 
+                self.score_bounds['fivekm_time']['max']
+            )
+
+            bench_press_norm = self.calculate_normalise_score(
+                row['bench_press'], 
+                self.score_bounds['bench_press']['min'], 
+                self.score_bounds['bench_press']['max']
+            )
+
+            squat_norm = self.calculate_normalise_score(
+                row['squat'], 
+                self.score_bounds['squat']['min'], 
+                self.score_bounds['squat']['max']
+            )
+
+            overhead_press_norm = self.calculate_normalise_score(
+                row['overhead_press'], 
+                self.score_bounds['overhead_press']['min'], 
+                self.score_bounds['overhead_press']['max']
+            )
+
+            deadlift_norm = self.calculate_normalise_score(
+                row['deadlift'], 
+                self.score_bounds['deadlift']['min'], 
+                self.score_bounds['deadlift']['max']
+            )
+
 
             overall_score = self.calculate_average_scores(
                  pull_up_norm, fivekm_time_norm,
@@ -137,7 +176,9 @@ class FitnessTracker:
             cell.set_text_props(fontweight="bold", color="#1A365D")
 
         # plt.tight_layout()
-        out_file = BASE_DIR /"fitness_score.png"
+        out_file = self.BASE_DIR /"fitness_score.png"
+        if out_file.exists():
+            out_file.unlink()
         plt.savefig(out_file)
         plt.close()
 
@@ -146,7 +187,6 @@ class FitnessTracker:
         results_df = self.process_results()
         self.plot_results(results_df)
 
-BASE_DIR = Path(__file__).resolve().parent
-inp_file = BASE_DIR / "input_pbs.csv"
-fitness_tracker = FitnessTracker(inp_file)
+
+fitness_tracker = FitnessTracker()
 fitness_tracker.run()
