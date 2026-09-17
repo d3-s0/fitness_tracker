@@ -36,11 +36,11 @@ class FitnessTracker:
                 self.score_bounds['pull_up']['max']
             )
 
-            fivekm_time_norm = self.calculate_normalise_score(
-                row['fivekm_time'], 
-                self.score_bounds['fivekm_time']['min'], 
-                self.score_bounds['fivekm_time']['max']
-            )
+            # fivekm_time_norm = self.calculate_normalise_score(
+            #     row['fivekm_time'], 
+            #     self.score_bounds['fivekm_time']['min'], 
+            #     self.score_bounds['fivekm_time']['max']
+            # )
 
             bench_press_norm = self.calculate_normalise_score(
                 row['bench_press'], 
@@ -68,21 +68,22 @@ class FitnessTracker:
 
 
             overall_score = self.calculate_average_scores(
-                 pull_up_norm, fivekm_time_norm,
+                 pull_up_norm, 
                  bench_press_norm, squat_norm, overhead_press_norm, deadlift_norm
             )
+            #fivekm_time_norm,
 
             results.append({
                 'date': row['date'],
                 'Overall Score': overall_score,
                 'Pull up': pull_up_norm,
-                '5K': fivekm_time_norm,
+                #'5K': fivekm_time_norm,
                 'Bench press': bench_press_norm,
                 'Squat': squat_norm,
                 'Overhead press': overhead_press_norm,
                 'Deadlift':deadlift_norm,
                 'Pull up_raw': row['pull_up'],
-                '5K_raw': row['fivekm_time'],
+               # '5K_raw': row['fivekm_time'],
                 'Bench press_raw': row['bench_press'],
                 'Squat_raw': row['squat'],
                 'Overhead press_raw': row['overhead_press'],
@@ -102,11 +103,12 @@ class FitnessTracker:
             )
         data.set_index('date', inplace=True)
 
-        metrics = ['5K', 'Bench press', 'Deadlift', 'Overhead press', 'Pull up', 'Squat']
+        metrics = ['Bench press', 'Deadlift', 'Overhead press', 'Pull up', 'Squat']
+        #metrics = ['5K', 'Bench press', 'Deadlift', 'Overhead press', 'Pull up', 'Squat']
         fig, ax = plt.subplots(figsize=(8, 10))
         sns.lineplot(
             data=data[[
-                       '5K',
+                       #'5K',
                        'Bench press',
                        'Deadlift',
                        'Overhead press',
