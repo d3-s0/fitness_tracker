@@ -48,11 +48,11 @@ class FitnessTracker:
                 self.score_bounds['bench_press']['max']
             )
 
-            squat_norm = self.calculate_normalise_score(
-                row['squat'], 
-                self.score_bounds['squat']['min'], 
-                self.score_bounds['squat']['max']
-            )
+            # squat_norm = self.calculate_normalise_score(
+            #     row['squat'], 
+            #     self.score_bounds['squat']['min'], 
+            #     self.score_bounds['squat']['max']
+            # )
 
             overhead_press_norm = self.calculate_normalise_score(
                 row['overhead_press'], 
@@ -60,18 +60,18 @@ class FitnessTracker:
                 self.score_bounds['overhead_press']['max']
             )
 
-            deadlift_norm = self.calculate_normalise_score(
-                row['deadlift'], 
-                self.score_bounds['deadlift']['min'], 
-                self.score_bounds['deadlift']['max']
-            )
+            # deadlift_norm = self.calculate_normalise_score(
+            #     row['deadlift'], 
+            #     self.score_bounds['deadlift']['min'], 
+            #     self.score_bounds['deadlift']['max']
+            # )
 
 
             overall_score = self.calculate_average_scores(
                  pull_up_norm, 
-                 bench_press_norm, squat_norm, overhead_press_norm, deadlift_norm
+                 bench_press_norm,  overhead_press_norm, 
             )
-            #fivekm_time_norm,
+            #fivekm_time_norm,squat_norm,deadlift_norm
 
             results.append({
                 'date': row['date'],
@@ -79,15 +79,15 @@ class FitnessTracker:
                 'Pull up': pull_up_norm,
                 #'5K': fivekm_time_norm,
                 'Bench press': bench_press_norm,
-                'Squat': squat_norm,
+               # 'Squat': squat_norm,
                 'Overhead press': overhead_press_norm,
-                'Deadlift':deadlift_norm,
+               # 'Deadlift':deadlift_norm,
                 'Pull up_raw': row['pull_up'],
                # '5K_raw': row['fivekm_time'],
                 'Bench press_raw': row['bench_press'],
-                'Squat_raw': row['squat'],
+                #'Squat_raw': row['squat'],
                 'Overhead press_raw': row['overhead_press'],
-                'Deadlift_raw': row['deadlift']
+                #'Deadlift_raw': row['deadlift']
 
             })
 
@@ -103,17 +103,17 @@ class FitnessTracker:
             )
         data.set_index('date', inplace=True)
 
-        metrics = ['Bench press', 'Deadlift', 'Overhead press', 'Pull up', 'Squat']
+        metrics = ['Bench press',  'Overhead press', 'Pull up', ]
         #metrics = ['5K', 'Bench press', 'Deadlift', 'Overhead press', 'Pull up', 'Squat']
         fig, ax = plt.subplots(figsize=(8, 10))
         sns.lineplot(
             data=data[[
                        #'5K',
                        'Bench press',
-                       'Deadlift',
+                       #'Deadlift',
                        'Overhead press',
                        'Pull up',
-                       'Squat'
+                       #'Squat'
                        ]],
                        )
         
